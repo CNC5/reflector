@@ -24,11 +24,14 @@ This is a work in progress and any constructive critique is very welcome.
 - Link type outbounds
 
 ## Requirements
+- git
 - curl
 - python3.13
 
 ## Installation
 ```bash
+git clone https://github.com/CNC5/reflector.git
+cd reflector
 bash download_binaries.sh
 python -m venv .venv
 . .venv/bin/activate
