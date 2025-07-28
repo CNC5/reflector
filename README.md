@@ -1,6 +1,11 @@
 # Reflector
 
 A basic unit for reflecting xray, with some useful abstractions for clustering.
+This is a work in progress and any constructive critique is very welcome.
+
+## Goals
+- Easily usable xray that is configured according to best practices
+- Abstractions for clustering and HA
 
 ## Table of Contents
 
