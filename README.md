@@ -29,6 +29,8 @@ This is a work in progress and any constructive critique is very welcome.
 - python3.13
 
 ## Installation
+> [!IMPORTANT]
+> `download_binaries.sh` downloads binaries from my server: a sing-box that was most recently tested with reflector, and a static build of nginx that also was most recently tested to work with reflector. You can use your own binaries, by specifying `--nginx-bin`|`--xray-bin` or by putting them to `serverops/bin/{sing-box,nginx}`
 ```bash
 git clone https://github.com/CNC5/reflector.git
 cd reflector
