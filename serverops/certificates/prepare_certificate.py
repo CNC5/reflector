@@ -76,7 +76,6 @@ def _prepare_letsencrypt_certificate(domain: str, email: str) -> Certificate:
     certbot_process = subprocess.Popen([
         "certbot", "certonly",
         "--standalone",
-        "--staging",
         "--preferred-challenges", "http",
         "-d", domain,
         "-m", email,
