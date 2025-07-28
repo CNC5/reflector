@@ -5,6 +5,8 @@ A basic unit for reflecting xray, with some useful abstractions for clustering.
 ## Table of Contents
 
 - [Features](#features)
+- [Requirements](#requirements)
+- [Installation](#installation)
 - [Usage](#usage)
 - [Configuration](#configuration)
 - [License](#license)
@@ -16,11 +18,20 @@ A basic unit for reflecting xray, with some useful abstractions for clustering.
 - Multiple outbound users
 - Link type outbounds
 
-## Usage
+## Requirements
+- curl
+- python3.13
+
+## Installation
 ```bash
+bash download_binaries.sh
 python -m venv .venv
 . .venv/bin/activate
 pip install -r requirements.txt
+```
+
+## Usage
+```bash
 python -m serverops --help
 ```
 ```
