@@ -29,8 +29,13 @@ A basic unit for reflecting xray, with some useful abstractions for clustering.
 - certbot (for letsencrypt certs)
 
 ## Installation
+> [!NOTE]
+> You can use reflector docker image (you need to [install](https://docs.docker.com/engine/install/) docker)
+
 > [!IMPORTANT]
 > `download_binaries.sh` downloads binaries from my server: a sing-box that was most recently tested with reflector, and a static build of nginx that also was most recently tested to work with reflector. You can use your own binaries, by specifying `--nginx-bin`|`--xray-bin` or by putting them to `serverops/bin/{sing-box,nginx}`
+
+#### Bare-metal
 ```bash
 git clone https://github.com/CNC5/reflector.git
 cd reflector
@@ -41,6 +46,13 @@ pip install -r requirements.txt
 ```
 
 ## Usage
+
+#### Docker
+```bash
+docker run -it --rm z1xs4xg62/reflector:latest-alpine
+```
+
+#### Bare-metal
 ```bash
 python -m serverops --help
 ```
