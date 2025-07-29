@@ -5,7 +5,7 @@ import subprocess
 import time
 from copy import deepcopy
 from os import PathLike
-from typing import Dict, Set
+from typing import Dict, Set, List
 
 from .camo import CamoController
 from .certificates import Certificate, prepare_certificate
@@ -32,6 +32,7 @@ class Operator:
     xray_pid: int
 
     pid_file: PathLike[str]
+    inbound_ports: List[str]
 
     def __init__(self,
                  config_location: PathLike[str],
@@ -58,6 +59,7 @@ class Operator:
         self.xray = Xray(xray_bin, tmp_dir)
         self.xray_config = XrayConfig()
         self.pid_file = os.path.join(tmp_dir, pid_file)
+        self.inbound_ports = []
 
         # outbound_tag -> {users}
         # '*' user marks outbounds that can accept any user
@@ -125,6 +127,7 @@ class Operator:
                 ssl_certificate=certificate,
                 proxy_ssl_name=conf_inb.camo.fqdn
             )
+            self.inbound_ports.append(str(conf_inb.listen_port))
 
             # XRAY
             new_inb = self.xray_config.add_inbound(
@@ -280,7 +283,10 @@ class Operator:
             self.nginx_pid = nginx_process.pid
             self.xray_pid = xray_process.pid
 
-            logging.getLogger(__name__).info("serving")
+            boot_grace_seconds = 1
+            time.sleep(boot_grace_seconds)
+            logging.getLogger(__name__).info(
+                "serving on ports: " + ", ".join(self.inbound_ports))
             signal.signal(signal.SIGHUP, self.sighup_handler)
             poll_interval_seconds = 0.1
             while True:
