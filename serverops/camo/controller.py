@@ -16,7 +16,14 @@ def ensure_system_user(username: str) -> int:
             f"user {username} does not exist, creating")
         if shutil.which("useradd"):
             return subprocess.Popen(["useradd", username]).wait()
-        logging.getLogger(__name__).error("useradd is not available")
+        if shutil.which("adduser"):
+            return subprocess.Popen([
+                "adduser",
+                "-D",  # Don't assign a password
+                "-H",  # Don't create home directory
+                username]).wait()
+        logging.getLogger(__name__).error(
+            "user management utils are unavailable")
         return -1
 
 
@@ -28,7 +35,8 @@ def chown_recursive(
         logging.getLogger(__name__).error("refusing to chown /")
         return -1
     if ensure_system_user(username) != 0:
-        logging.getLogger(__name__).error("chown failed")
+        logging.getLogger(__name__).error(
+            "chown failed as there is no requested user")
         return -1
     group = username if group is None else group
     return subprocess.Popen(

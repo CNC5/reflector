@@ -10,5 +10,6 @@ RUN bash download_binaries.sh
 RUN apk add --no-cache openssl
 COPY serverops serverops
 COPY test.config.yaml config.yaml
+RUN adduser -D -G www-data www-data
 
 ENTRYPOINT ["python", "-m", "serverops"]
