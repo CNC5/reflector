@@ -1,0 +1,33 @@
+apiVersion: v1
+kind: Reflector
+spec:
+  inbounds:
+    - name: vless-in
+      type: vless
+      listen: 0.0.0.0
+      listen_port: 443
+      users:
+        - name: bob
+          uuid: bb3bb3bb-bbbb-bbbb-bbbb-bb3bbbbbb3bb
+          flow: ''
+          short_id: b0b01d
+      private_key: KMDYAHPo2W2ycEGSEhRV7KWDgKcL6vjvgw57iPdsF0g
+      camo:
+        type: local
+        template: NextJSExample
+        fqdn: vacuums.lemao.xyz
+        issuer:
+          type: selfsigned # can also be 'selfsigned' for testing, no email required
+          email: an0n@mozmail.com
+
+  outbounds:
+    - name: direct
+      type: direct
+
+  routes:
+    - user: bob
+      outbound: direct
+
+  metrics:
+    port: 12345
+    listen: localhost

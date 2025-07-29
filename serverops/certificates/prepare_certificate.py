@@ -43,7 +43,7 @@ def prepare_certificate(certificate_type: str,
 
 
 def _prepare_selfsigned_certificate(domain: str) -> Certificate:
-    directory = f"test-cert/{domain}/"
+    directory = f"/tmp/test-cert/{domain}/"
     directory = os.path.realpath(directory)
     os.makedirs(directory, exist_ok=True)
     certificate = os.path.join(directory, "cert.pem")
