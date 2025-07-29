@@ -23,10 +23,10 @@ A basic unit for reflecting xray, with some useful abstractions for clustering.
 - Link type outbounds
 
 ## Requirements
-- git
-- curl
-- python3.13
-- certbot
+- git (install)
+- curl (install)
+- python3.13 (interpreter)
+- certbot (for letsencrypt certs)
 
 ## Installation
 > [!IMPORTANT]
