@@ -26,6 +26,7 @@ A basic unit for reflecting xray, with some useful abstractions for clustering.
 - git
 - curl
 - python3.13
+- certbot
 
 ## Installation
 > [!IMPORTANT]
