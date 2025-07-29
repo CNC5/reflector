@@ -12,7 +12,9 @@ class Xray:
     temp_config: str
     prefix: PathLike[str]
 
-    def __init__(self, xray_binary_path: PathLike[str], tmp_dir: PathLike[str]):
+    def __init__(self,
+                 xray_binary_path: PathLike[str],
+                 tmp_dir: PathLike[str]):
         self.xray_binary_path = xray_binary_path
         self.prefix = tmp_dir
         self.temp_config_filename = "sing.json"
@@ -33,5 +35,5 @@ class Xray:
         generate_config(self.temp_config, config)
         result = subprocess.Popen(
             [self.xray_binary_path, *self.assemble_args()],
-            shell=False) #, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            shell=False)
         return result

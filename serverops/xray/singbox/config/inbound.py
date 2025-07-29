@@ -1,19 +1,25 @@
-import dataclasses
 from typing import List, Dict
 
 from .parser import XrayDumpableConfig
-from .shared import ListenFields, TLSInbound, MultiplexInbound, V2RayTransport, DialFields
+from .shared import (
+    ListenFields,
+    TLSInbound,
+    MultiplexInbound,
+    V2RayTransport,
+    DialFields)
 
 
 class User(XrayDumpableConfig):
     username: str
     password: str
 
+
 class ShadowsocksDestination(XrayDumpableConfig):
     name: str
     server: str
     server_port: int
     password: str
+
 
 class Inbound(XrayDumpableConfig):
     type: str
@@ -39,6 +45,7 @@ class Inbound(XrayDumpableConfig):
     class Shadowsocks(ListenFields, XrayDumpableConfig):
         method: str
         password: str
+
         class User(XrayDumpableConfig):
             name: str
             password: str
@@ -62,12 +69,13 @@ class Inbound(XrayDumpableConfig):
             password: str
         users: List[User]
         tls: TLSInbound
+
         class Fallback(XrayDumpableConfig):
             server: str
             server_port: int
         fallback: Fallback
         fallback_for_alpn = {
-            "http/1.1": { # name not suitable for a variable
+            "http/1.1": {  # name not suitable for a variable
                 "server": "127.0.0.1",
                 "server_port": 8081
             }
@@ -86,6 +94,7 @@ class Inbound(XrayDumpableConfig):
         down: str
         down_mbps: int
         obfs: str
+
         class User(XrayDumpableConfig):
             name: str
             auth: str
@@ -100,14 +109,17 @@ class Inbound(XrayDumpableConfig):
     class ShadowTLS(ListenFields, XrayDumpableConfig):
         version: int
         password: str
+
         class User(XrayDumpableConfig):
             name: str
             password: str
         users: List[User]
+
         class Handshake(DialFields, XrayDumpableConfig):
             server: str
             server_port: int
         handshake: Handshake
+
         class HandshakeServerName(DialFields, XrayDumpableConfig):
             server: str
             server_port: str
@@ -130,16 +142,19 @@ class Inbound(XrayDumpableConfig):
     class Hysteria2(ListenFields, XrayDumpableConfig):
         up_mbps: int
         down_mbps: int
+
         class OBFS(XrayDumpableConfig):
             type: str
             password: str
         obfs = OBFS()
+
         class User(XrayDumpableConfig):
             name: str
             password: str
         users: List[User]
         ignore_client_bandwidth: bool
         tls: TLSInbound
+
         class Masquerade(XrayDumpableConfig):
             type: str
             directory: str
@@ -197,6 +212,7 @@ class Inbound(XrayDumpableConfig):
         include_android_user: List[int]
         include_package: List[str]
         exclude_package: List[str]
+
         class Platform(XrayDumpableConfig):
             class HTTPProxy(XrayDumpableConfig):
                 enabled: bool
@@ -238,4 +254,3 @@ class Inbound(XrayDumpableConfig):
         new_class.type = inbound_type
         new_class.tag = inbound_tag
         return new_class
-

@@ -3,8 +3,10 @@ from .mimetypes import load_default_mime_types
 from .parser import NginxDumpableConfig
 from ..certificates import prepare_certificate, Certificate
 
+
 class NginxHTTPServerLocationConfig(NginxDumpableConfig):
     params: dict
+
 
 class NginxHTTPServerConfig(NginxDumpableConfig):
     params: dict
@@ -14,23 +16,26 @@ class NginxHTTPServerConfig(NginxDumpableConfig):
         self.location = dict()
         super().__init__()
 
-    def add_static_location(self, path: str, content_location: str, autoindex=False):
+    def add_static_location(self,
+                            path: str,
+                            content_location: str,
+                            autoindex=False):
         self.location.update({path:
-            NginxHTTPServerLocationConfig()
-            .set_param("autoindex", "on" if autoindex else "off")
-            .set_param("index", "index.html")
-            .set_param("root", content_location)
-            .set_param("max_ranges", "1000000000000000")
-            #.set_param("try_files", "$uri $uri.html $uri/index.html")
-        })
+                              NginxHTTPServerLocationConfig()
+                              .set_param("autoindex", "on"
+                                         if autoindex else "off")
+                              .set_param("index", "index.html")
+                              .set_param("root", content_location)
+                              .set_param("max_ranges", "1000000000000000")
+                              })
         return self
 
     def add_proxy_location(self, path: str, proxy_pass: str):
         self.location.update({path:
-            NginxHTTPServerLocationConfig()
-            .set_param("proxy_pass", proxy_pass)
-            .set_param("proxy_set_header", "Host $host")
-        })
+                              NginxHTTPServerLocationConfig()
+                              .set_param("proxy_pass", proxy_pass)
+                              .set_param("proxy_set_header", "Host $host")
+                              })
         return self
 
     def add_ssl(
@@ -49,8 +54,10 @@ class NginxHTTPServerConfig(NginxDumpableConfig):
     def add_http2(self):
         self.set_param("http2", "on")
 
+
 class NginxHTTPMimeTypesConfig(NginxDumpableConfig):
     params: dict
+
 
 class NginxHTTPConfig(NginxDumpableConfig):
     params: dict
@@ -63,7 +70,6 @@ class NginxHTTPConfig(NginxDumpableConfig):
         super().__init__()
         load_default_mime_types(self.types)
         self.set_param("access_log", "/dev/stdout")
-
 
     def add_static_server(
             self,
@@ -117,6 +123,7 @@ class NginxEventsConfig(NginxDumpableConfig):
     def __init__(self):
         super().__init__()
         self.set_param("worker_connections", "1024")
+
 
 class NginxConfig(NginxDumpableConfig):
     params: dict

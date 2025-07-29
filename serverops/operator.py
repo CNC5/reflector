@@ -11,8 +11,12 @@ from .camo import CamoController
 from .certificates import Certificate, prepare_certificate
 from .config import ConfigV1, load_config
 from .nginx import Nginx, NginxConfig
-from .utils import check_existence_on_disk, find_free_port, reset_allocated_ports
+from .utils import (
+    check_existence_on_disk,
+    find_free_port,
+    reset_allocated_ports)
 from .xray import Xray, XrayConfig
+
 
 class Operator:
     config: ConfigV1
@@ -28,7 +32,6 @@ class Operator:
     xray_pid: int
 
     pid_file: PathLike[str]
-
 
     def __init__(self,
                  config_location: PathLike[str],
@@ -72,27 +75,26 @@ class Operator:
                                    ssl_domain: str,
                                    ssl_certificate: Certificate):
         camo_path = self.camo_controller.prepare_camo(camo_template_name)
-        (self.nginx_config.http
-        .add_static_server(
+        self.nginx_config.http.add_static_server(
             server_name=ssl_domain,
             listen=f"127.0.0.1:{local_camo_https_port}",
             root=camo_path,
             ssl_certificate=ssl_certificate)
-        )
-        logging.getLogger(__name__).debug(f"{camo_template_name} camo configured")
+        logging.getLogger(__name__).debug(
+            f"{camo_template_name} camo configured")
 
     def configure_nginx_xray_proxy(self,
                                    listen: str,
                                    proxy_pass: str,
-                                   ssl_domain: str, ssl_certificate: Certificate, proxy_ssl_name: str):
-        (self.nginx_config.http
-         .add_proxy_server(
+                                   ssl_domain: str,
+                                   ssl_certificate: Certificate,
+                                   proxy_ssl_name: str):
+        self.nginx_config.http.add_proxy_server(
             server_name=ssl_domain,
             listen=listen,
             proxy_pass=proxy_pass,
             ssl_certificate=ssl_certificate,
-            proxy_ssl_name=proxy_ssl_name
-        ))
+            proxy_ssl_name=proxy_ssl_name)
 
     # Putting parsing here is bad, TODO
     def parse_config(self):
@@ -101,13 +103,15 @@ class Operator:
             local_camo_port = find_free_port()
             local_xray_port = find_free_port()
 
-            #NGX
+            # NGX
             certificate = prepare_certificate(
                 conf_inb.camo.issuer.type,
                 conf_inb.camo.fqdn,
-                conf_inb.camo.issuer.email if conf_inb.camo.issuer.type == "letsencrypt" else None
+                conf_inb.camo.issuer.email
+                if conf_inb.camo.issuer.type == "letsencrypt" else None
             )
-            logging.getLogger(__name__).debug(f"processing inbound {conf_inb.name}")
+            logging.getLogger(__name__).debug(
+                f"processing inbound {conf_inb.name}")
             self.configure_nginx_local_camo(
                 camo_template_name=conf_inb.camo.template,
                 local_camo_https_port=local_camo_port,
@@ -123,7 +127,9 @@ class Operator:
             )
 
             # XRAY
-            new_inb = self.xray_config.add_inbound(inbound_type=conf_inb.type, inbound_tag=conf_inb.name)
+            new_inb = self.xray_config.add_inbound(
+                inbound_type=conf_inb.type,
+                inbound_tag=conf_inb.name)
             if conf_inb.type == "vless":
                 new_inb.listen = "127.0.0.1"
                 new_inb.listen_port = local_xray_port
@@ -147,14 +153,19 @@ class Operator:
                     reality.short_id.append(user.short_id)
 
         for conf_out in config.spec.outbounds:
-            logging.getLogger(__name__).debug(f"processing outbound {conf_out.name}")
+            logging.getLogger(__name__).debug(
+                f"processing outbound {conf_out.name}")
             if conf_out.type == "link":
-                new_out = self.xray_config.add_outbound_from_link(conf_out.link, conf_out.name)
+                new_out = self.xray_config.add_outbound_from_link(
+                    conf_out.link,
+                    conf_out.name)
                 self._add_user_mapping(new_out.tag, "*")
             elif conf_out.type == "vless":
                 for user in conf_out.users:
                     out_name = f"{user.name}@{conf_out.name}"
-                    new_out = self.xray_config.add_outbound(conf_out.type, out_name)
+                    new_out = self.xray_config.add_outbound(
+                        conf_out.type,
+                        out_name)
                     new_out.server = conf_out.server
                     new_out.server_port = conf_out.server_port
                     new_out.uuid = user.uuid
@@ -162,7 +173,8 @@ class Operator:
                     tls = new_out.tls = new_out.__annotations__["tls"]()
                     tls.enabled = True
                     tls.disable_sni = False
-                    tls.server_name = conf_out.server_name if conf_out.server_name else conf_out.server
+                    tls.server_name = conf_out.server_name \
+                        if conf_out.server_name else conf_out.server
                     if conf_out.fingerprint is not None:
                         utls = tls.utls = tls.__annotations__["utls"]()
                         utls.enabled = True
@@ -175,31 +187,45 @@ class Operator:
                     new_out.packet_encoding = ""
                     self._add_user_mapping(conf_out.name, user.name)
             elif conf_out.type == "direct":
-                new_out = self.xray_config.add_outbound(conf_out.type, conf_out.name)
+                new_out = self.xray_config.add_outbound(
+                    conf_out.type,
+                    conf_out.name)
                 self._add_user_mapping(new_out.tag, "*")
 
         for conf_rou in config.spec.routes:
-            logging.getLogger(__name__).debug(f"processing route for user {conf_rou.user}")
-            possible_users = self.outbounds_to_users_mapping.get(conf_rou.outbound)
+            logging.getLogger(__name__).debug(
+                f"processing route for user {conf_rou.user}")
+            possible_users = self.outbounds_to_users_mapping.get(
+                conf_rou.outbound)
             if possible_users is None:
-                logging.getLogger(__name__).info(f"outbound {conf_rou.outbound} was not found, skipping route for user {conf_rou.user}")
+                logging.getLogger(__name__).info(
+                    f"outbound {conf_rou.outbound} was not found, "
+                    f"skipping route for user {conf_rou.user}")
                 continue
-            if (conf_rou.user not in possible_users) and ("*" not in possible_users):
-                logging.getLogger(__name__).info(f"{conf_rou.user} user is not allowed to egress from "
-                                 f"{conf_rou.outbound} outbound and outbound is not wildcard")
+            if (
+                    conf_rou.user not in possible_users) and (
+                    "*" not in possible_users):
+                logging.getLogger(__name__).info(
+                    f"{conf_rou.user} user is not allowed to egress from "
+                    f"{conf_rou.outbound} outbound and "
+                    f"outbound is not wildcard")
                 continue
             if "*" in possible_users:
                 new_rou = self.xray_config.add_route(conf_rou.outbound)
                 new_rou.auth_user.append(conf_rou.user)
-                logging.getLogger(__name__).debug(f"route created '{conf_rou.user}'->'{conf_rou.outbound}'")
+                logging.getLogger(__name__).debug(
+                    f"route created '{conf_rou.user}'->'{conf_rou.outbound}'")
                 continue
             if conf_rou.user in possible_users:
-                new_rou = self.xray_config.add_route(f"{conf_rou.user}@{conf_rou.outbound}")
+                new_rou = self.xray_config.add_route(
+                    f"{conf_rou.user}@{conf_rou.outbound}")
                 new_rou.auth_user.append(conf_rou.user)
-                logging.getLogger(__name__).debug(f"route created '{conf_rou.user}'->'{conf_rou.outbound}'")
+                logging.getLogger(__name__).debug(
+                    f"route created '{conf_rou.user}'->'{conf_rou.outbound}'")
                 continue
-            logging.getLogger(__name__).info(f"route did not match any criteria "
-                             f"(user: {conf_rou.user}; outbound: {conf_rou.outbound})")
+            logging.getLogger(__name__).info(
+                f"route did not match any criteria "
+                f"(user: {conf_rou.user}; outbound: {conf_rou.outbound})")
 
     def validate_updated_config(self) -> bool:
         prev_config = deepcopy(self.config)
@@ -211,7 +237,7 @@ class Operator:
         try:
             self.config = load_config(self.config_location)
             self.parse_config()
-            logging.getLogger(__name__).debug(f"config validation succeeded")
+            logging.getLogger(__name__).debug("config validation succeeded")
             valid = True
         except Exception as e:
             logging.getLogger(__name__).error(f"config validation failed: {e}")
@@ -224,7 +250,7 @@ class Operator:
 
     def sighup_handler(self, signum: int, frame):
         if not self.validate_updated_config():
-            logging.getLogger(__name__).error(f"reload aborted")
+            logging.getLogger(__name__).error("reload aborted")
             return
         self.config = load_config(self.config_location)
         self.nginx_config = NginxConfig()
@@ -239,13 +265,12 @@ class Operator:
         os.kill(self.xray_pid, signal.SIGHUP)
         logging.getLogger(__name__).info("sighup reload succeeded")
 
-
     def run(self):
         nginx_process = None
         xray_process = None
         try:
             self.parse_config()
-            logging.getLogger(__name__).debug(f"reflector booting")
+            logging.getLogger(__name__).debug("reflector booting")
             pid = os.getpid()
             logging.getLogger(__name__).debug(f"reflector pid: {pid}")
             with open(self.pid_file, "w") as pf:
@@ -255,19 +280,23 @@ class Operator:
             self.nginx_pid = nginx_process.pid
             self.xray_pid = xray_process.pid
 
-            logging.getLogger(__name__).info(f"serving")
+            logging.getLogger(__name__).info("serving")
             signal.signal(signal.SIGHUP, self.sighup_handler)
             poll_interval_seconds = 0.1
             while True:
                 nginx_code = nginx_process.poll()
                 xray_code = xray_process.poll()
                 if nginx_code is not None:
-                    logging.getLogger(__name__).error(f"nginx exited with {nginx_code}")
-                    logging.getLogger(__name__).critical(f"can't operate without nginx, shutting down")
+                    logging.getLogger(__name__).error(
+                        f"nginx exited with {nginx_code}")
+                    logging.getLogger(__name__).critical(
+                        "can't operate without nginx, shutting down")
                     break
                 if xray_code is not None:
-                    logging.getLogger(__name__).error(f"xray exited with {xray_code}")
-                    logging.getLogger(__name__).critical(f"can't operate without xray, shutting down")
+                    logging.getLogger(__name__).error(
+                        f"xray exited with {xray_code}")
+                    logging.getLogger(__name__).critical(
+                        "can't operate without xray, shutting down")
                     break
                 time.sleep(poll_interval_seconds)
         except KeyboardInterrupt:
@@ -278,7 +307,8 @@ class Operator:
                 nginx_process.terminate()
                 try:
                     nginx_process.wait(timeout=graceful_timeout_seconds)
-                    logging.getLogger(__name__).debug("nginx graceful termination")
+                    logging.getLogger(__name__).debug(
+                        "nginx graceful termination")
                 except subprocess.TimeoutExpired:
                     nginx_process.kill()
                     logging.getLogger(__name__).debug("nginx kill")
@@ -286,7 +316,8 @@ class Operator:
                 xray_process.terminate()
                 try:
                     xray_process.wait(timeout=graceful_timeout_seconds)
-                    logging.getLogger(__name__).debug("xray graceful termination")
+                    logging.getLogger(__name__).debug(
+                        "xray graceful termination")
                 except subprocess.TimeoutExpired:
                     xray_process.kill()
                     logging.getLogger(__name__).debug("xray kill")

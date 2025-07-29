@@ -1,6 +1,8 @@
 from .parser import NginxDumpableConfig
 
-def load_default_mime_types(config: NginxDumpableConfig) -> NginxDumpableConfig:
+
+def load_default_mime_types(
+        config: NginxDumpableConfig) -> NginxDumpableConfig:
     (config
         .set_param("text/html", "html htm shtml")
         .set_param("text/css", "css")
@@ -43,9 +45,15 @@ def load_default_mime_types(config: NginxDumpableConfig) -> NginxDumpableConfig:
         .set_param("application/vnd.oasis.opendocument.presentation", "odp")
         .set_param("application/vnd.oasis.opendocument.spreadsheet", "ods")
         .set_param("application/vnd.oasis.opendocument.text", "odt")
-        .set_param("application/vnd.openxmlformats-officedocument.presentationml.presentation", "pptx")
-        .set_param("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "xlsx")
-        .set_param("application/vnd.openxmlformats-officedocument.wordprocessingml.document", "docx")
+        .set_param("application/"
+                   "vnd.openxmlformats-officedocument."
+                   "presentationml.presentation", "pptx")
+        .set_param("application/"
+                   "vnd.openxmlformats-officedocument."
+                   "spreadsheetml.sheet", "xlsx")
+        .set_param("application/"
+                   "vnd.openxmlformats-officedocument."
+                   "wordprocessingml.document", "docx")
         .set_param("application/vnd.wap.wmlc", "wmlc")
         .set_param("application/wasm", "wasm")
         .set_param("application/x-7z-compressed", "7z")

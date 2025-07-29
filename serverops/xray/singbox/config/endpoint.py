@@ -13,6 +13,7 @@ class WireguardPeer(XrayDumpableConfig):
     persistent_keepalive_interval: int
     reserved: List[int]
 
+
 class Endpoint(XrayDumpableConfig):
     type: str
     tag: str

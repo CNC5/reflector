@@ -14,7 +14,7 @@ class NginxDumpableConfig:
             if key == "params":
                 dumpdict.update(value)
                 continue
-            if type(value) == list:
+            if isinstance(value, list):
                 dumpdict[key] = [i.dump() for i in value]
                 continue
         return dumpdict
@@ -29,20 +29,20 @@ class NginxDumpableConfig:
             if hasattr(value, "dump_formatted"):
                 lines.append(key + " {")
                 for line in value.dump_formatted():
-                    lines.append(" "*indent + line)
+                    lines.append(" " * indent + line)
                 lines.append("}")
-            if type(value) == list:
+            if isinstance(value, list):
                 for item in value:
                     lines.append(key + " {")
                     for line in item.dump_formatted(indent):
-                        lines.append(" "*indent + line)
+                        lines.append(" " * indent + line)
                     lines.append("}")
                 continue
-            if type(value) == dict:
+            if isinstance(value, dict):
                 for k, v in value.items():
                     lines.append(key + " " + k + " {")
                     for line in v.dump_formatted(indent):
-                        lines.append(" "*indent + line)
+                        lines.append(" " * indent + line)
                     lines.append("}")
                 continue
 

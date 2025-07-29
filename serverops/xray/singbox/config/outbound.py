@@ -1,9 +1,12 @@
-import dataclasses
 from typing import Union, Dict, List
 
-from .endpoint import WireguardPeer
 from .parser import XrayDumpableConfig
-from .shared import DialFields, UDPoverTCP, TLSOutbound, MultiplexOutbound, V2RayTransport
+from .shared import (
+    DialFields,
+    UDPoverTCP,
+    TLSOutbound,
+    MultiplexOutbound,
+    V2RayTransport)
 
 
 class Outbound(XrayDumpableConfig):
@@ -75,6 +78,7 @@ class Outbound(XrayDumpableConfig):
         interface_name: str
         local_address: List[str]
         private_key: str
+
         class WireguardPeer(XrayDumpableConfig):
             server: str
             server_port: int
@@ -146,6 +150,7 @@ class Outbound(XrayDumpableConfig):
         hop_interval: str
         up_mbps: int
         down_mbps: int
+
         class OBFS(XrayDumpableConfig):
             type: str
             password: str

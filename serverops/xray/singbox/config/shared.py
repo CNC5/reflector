@@ -21,13 +21,16 @@ class DialFields:
     fallback_network_type: List[str]
     fallback_delay: str
 
+
 class ExternalAccountFields(XrayDumpableConfig):
     key_id: str = ""
     mac_key: str = ""
 
+
 class DNS01ChallengeFields(XrayDumpableConfig):
     provider: str = "cloudflare"
     api_token: str = ""
+
 
 class ACMEFields(XrayDumpableConfig):
     domain: List[str]
@@ -42,9 +45,11 @@ class ACMEFields(XrayDumpableConfig):
     external_account = ExternalAccountFields()
     dns01_challenge = DNS01ChallengeFields()
 
+
 class RealityHandshakeFields(DialFields, XrayDumpableConfig):
     server: str = "google.com"
     server_port: int = 443
+
 
 class TLSInbound(XrayDumpableConfig):
     enabled: bool = True
@@ -58,11 +63,13 @@ class TLSInbound(XrayDumpableConfig):
     key: List[str]
     key_path: str
     acme: ACMEFields
+
     class ECHFields(XrayDumpableConfig):
         enabled: bool = False
         key: List[str]
         key_path: str
     ech: ECHFields
+
     class RealityFields(XrayDumpableConfig):
         enabled: False
         handshake: RealityHandshakeFields
@@ -70,6 +77,7 @@ class TLSInbound(XrayDumpableConfig):
         short_id: List[str]
     reality: RealityFields
     max_time_difference: str = "1m"
+
 
 class TLSOutbound(XrayDumpableConfig):
     enabled: bool = True
@@ -85,20 +93,24 @@ class TLSOutbound(XrayDumpableConfig):
     fragment: bool = False
     fragment_fallback_delay: str
     record_fragment: bool = False
+
     class ECHFields(XrayDumpableConfig):
         enabled: False
         config: List[str]
         config_path: str
     ech: ECHFields
+
     class UTLSFields(XrayDumpableConfig):
         enabled: bool = False
         fingerprint: str
     utls: UTLSFields
+
     class RealityFields(XrayDumpableConfig):
         enabled: bool = False
         public_key: str
         short_id: str
     reality: RealityFields
+
 
 class ListenFields:
     listen: str
@@ -113,15 +125,18 @@ class ListenFields:
     udp_timeout: str
     detour: str
 
+
 class TCPBrutal(XrayDumpableConfig):
     enabled: bool = True
     up_mbps: int
     down_mbps: int
 
+
 class MultiplexInbound(XrayDumpableConfig):
     enabled: bool = True
     padding: bool = False
     brutal: TCPBrutal
+
 
 class MultiplexOutbound(XrayDumpableConfig):
     enabled: bool = True
@@ -131,6 +146,7 @@ class MultiplexOutbound(XrayDumpableConfig):
     max_streams: int
     padding: bool = False
     brutal: TCPBrutal
+
 
 class V2RayTransport:
     type: str
@@ -151,7 +167,8 @@ class V2RayTransport:
 
     class QUIC(XrayDumpableConfig):
         pass
-        # No additional encryption support: It's basically duplicate encryption.
+        # No additional encryption support:
+        # It's basically duplicate encryption.
         # And Xray-core is not compatible with v2ray-core in here.
 
     class GRPC(XrayDumpableConfig):
@@ -173,10 +190,14 @@ class V2RayTransport:
         "httpupgrade": HTTPUpgrade
     }
 
-    def __new__(cls, dns_server_type: str, dns_server_tag: str, *args, **kwargs):
+    def __new__(cls,
+                dns_server_type: str,
+                dns_server_tag: str,
+                *args, **kwargs):
         new_class = cls._type_mapping[dns_server_type]()
         new_class.type = dns_server_type
         return new_class
+
 
 class UDPoverTCP(XrayDumpableConfig):
     enabled: bool

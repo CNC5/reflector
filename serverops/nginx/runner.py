@@ -5,13 +5,16 @@ from typing import List
 
 from .config import NginxConfig, generate_config
 
+
 class Nginx:
     nginx_binary_path: PathLike[str]
     temp_config_filename: str
     temp_config: str
     prefix: PathLike[str]
 
-    def __init__(self, nginx_binary_path: PathLike[str], tmp_dir: PathLike[str]):
+    def __init__(self,
+                 nginx_binary_path: PathLike[str],
+                 tmp_dir: PathLike[str]):
         self.nginx_binary_path = nginx_binary_path
         self.prefix = tmp_dir
         self.temp_config_filename = "nginx.conf"
@@ -33,6 +36,5 @@ class Nginx:
         generate_config(self.temp_config, config)
         result = subprocess.Popen(
             [self.nginx_binary_path, *self.assemble_args()],
-            shell=False) #, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            shell=False)
         return result
-

@@ -4,6 +4,7 @@ from typing import List, Dict
 from .shared import DialFields, TLSOutbound
 from .parser import XrayDumpableConfig
 
+
 class DNSServer(XrayDumpableConfig):
     type: str
     tag: str
@@ -77,11 +78,15 @@ class DNSServer(XrayDumpableConfig):
         "resolved": Resolved
     }
 
-    def __new__(cls, dns_server_type: str, dns_server_tag: str, *args, **kwargs):
+    def __new__(cls,
+                dns_server_type: str,
+                dns_server_tag: str,
+                *args, **kwargs):
         new_class = cls._type_mapping[dns_server_type]()
         new_class.type = dns_server_type
         new_class.tag = dns_server_tag
         return new_class
+
 
 class DNSRule(XrayDumpableConfig):
     inbound: List[str]
@@ -122,6 +127,7 @@ class DNSRule(XrayDumpableConfig):
     outbound: [str]
     action: str
     server: str
+
 
 class DNS(XrayDumpableConfig):
     servers: List[DNSServer]

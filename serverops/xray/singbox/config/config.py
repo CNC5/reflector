@@ -1,5 +1,4 @@
 import json
-from os import PathLike
 from typing import List
 from urllib.parse import urlparse, parse_qs
 
@@ -10,10 +9,10 @@ from .inbound import Inbound
 from .ntp import NTP
 from .outbound import Outbound
 from .parser import XrayDumpableConfig
-import os
 
 from .route import Route, RouteRule
 from .shared import TLSOutbound
+
 
 class Log(XrayDumpableConfig):
     disabled: bool
@@ -27,6 +26,7 @@ class Log(XrayDumpableConfig):
         self.output = "xray.log"
         self.timestamp = True
 
+
 class XrayConfig(XrayDumpableConfig):
     log: Log
     dns: DNS
@@ -37,8 +37,8 @@ class XrayConfig(XrayDumpableConfig):
     outbounds: List[Outbound]
     route: Route
     # TODO
-    #services: List[XrayServiceConfig]
-    #experimental: XrayExperimentalConfig
+    # services: List[XrayServiceConfig]
+    # experimental: XrayExperimentalConfig
 
     def __init__(self):
         self.log = Log()
@@ -104,6 +104,7 @@ class XrayConfig(XrayDumpableConfig):
         self.route.rules.append(new_route)
         return new_route
 
+
 def generate_config(location: str, config: XrayConfig):
-        with open(location, "w") as f:
-            f.write(json.dumps(config.dump()))
+    with open(location, "w") as f:
+        f.write(json.dumps(config.dump()))

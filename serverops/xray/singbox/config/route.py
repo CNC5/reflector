@@ -41,6 +41,7 @@ class RouteRule(XrayDumpableConfig):
     # DEPRECATED
     outbound: str
 
+
 class RouteRuleLogical(XrayDumpableConfig):
     type: str
     mode: str
@@ -49,10 +50,12 @@ class RouteRuleLogical(XrayDumpableConfig):
     action: str
     outbound: str
 
+
 class RuleSet(XrayDumpableConfig):
     type: str
     tag: str
     rules: List[RouteRule | RouteRuleLogical]
+
 
 class Route(XrayDumpableConfig):
     rules: List[RouteRule | RouteRuleLogical]
