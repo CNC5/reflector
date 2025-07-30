@@ -33,13 +33,15 @@ A basic unit for reflecting xray, with some useful abstractions for clustering.
 > You can use reflector docker image instead (you probably should)(requires to [install](https://docs.docker.com/engine/install/) docker)
 
 > [!IMPORTANT]
-> `download_binaries.sh` downloads binaries from my server: a sing-box that was most recently tested with reflector, and a static build of nginx that also was most recently tested to work with reflector. You can use your own binaries, by specifying `--nginx-bin`|`--xray-bin` or by putting them to `serverops/bin/{sing-box,nginx}`
+> `download_binaries.sh` downloads binaries: a sing-box that was most recently tested with reflector, and a static build of nginx that also was most recently tested to work with reflector. You can use your own binaries, by specifying `--nginx-bin`|`--xray-bin` or by putting them to `serverops/bin/{sing-box,nginx}`.
+> `download_camo_templates.sh` downloads an example template.
 
 #### Bare-metal
 ```bash
 git clone https://github.com/CNC5/reflector.git
 cd reflector
 bash download_binaries.sh
+bash download_camo_templates.sh
 python -m venv .venv
 . .venv/bin/activate
 pip install -r requirements.txt
