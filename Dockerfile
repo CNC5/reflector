@@ -9,6 +9,8 @@ RUN apk add --no-cache bash curl
 # Runtime dependencies
 COPY download_binaries.sh download_binaries.sh
 RUN bash download_binaries.sh
+COPY download_camo_templates.sh download_camo_templates.sh
+RUN bash download_camo_templates.sh
 RUN apk add --no-cache openssl certbot
 COPY serverops serverops
 COPY test.config.yaml config.yaml
