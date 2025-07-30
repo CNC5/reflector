@@ -30,7 +30,7 @@ A basic unit for reflecting xray, with some useful abstractions for clustering.
 
 ## Installation
 > [!NOTE]
-> You can use reflector docker image (you need to [install](https://docs.docker.com/engine/install/) docker)
+> You can use reflector docker image instead (you probably should)(requires to [install](https://docs.docker.com/engine/install/) docker)
 
 > [!IMPORTANT]
 > `download_binaries.sh` downloads binaries from my server: a sing-box that was most recently tested with reflector, and a static build of nginx that also was most recently tested to work with reflector. You can use your own binaries, by specifying `--nginx-bin`|`--xray-bin` or by putting them to `serverops/bin/{sing-box,nginx}`
@@ -49,13 +49,31 @@ pip install -r requirements.txt
 
 #### Docker
 ```bash
-docker run -it --rm z1xs4xg62/reflector:latest-alpine
+docker run -it --rm z1xs4xg62/reflector:latest-alpine --help
+```
+Example output
+```
+usage: __main__.py [-h] [--tmp TMP] [-c CONFIG] [--pid-file PID_FILE] [--nginx-bin NGINX_BIN] [--xray-bin XRAY_BIN]
+                   [--camo-dir CAMO_DIR] [-d] [-s SIGNAL]
+
+options:
+  -h, --help            show this help message and exit
+  --tmp TMP             directory for tmp storage
+  -c, --config CONFIG   config file, in cwd
+  --pid-file PID_FILE   pid file, in the tmp directory
+  --nginx-bin NGINX_BIN
+                        nginx binary
+  --xray-bin XRAY_BIN   xray binary
+  --camo-dir CAMO_DIR   camo templates dir
+  -d, --debug
+  -s, --signal SIGNAL   send a signal to the operator
 ```
 
 #### Bare-metal
 ```bash
 python -m serverops --help
 ```
+Example output
 ```
 usage: __main__.py [-h] [--tmp TMP] [-c CONFIG] [--pid-file PID_FILE] [--nginx-bin NGINX_BIN] [--xray-bin XRAY_BIN]
                    [--camo-dir CAMO_DIR] [-d] [-s SIGNAL]
