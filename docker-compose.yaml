@@ -1,6 +1,6 @@
 services:
   reflector:
-    image: z1xs4xg62/reflector:latest-alpine
+    image: ghcr.io/cnc5/reflector:latest-alpine
     ports:
       - 443:443
       - 80:80
