@@ -3,6 +3,7 @@ services:
     image: z1xs4xg62/reflector:latest-alpine
     ports:
       - 443:443
+      - 80:80
     volumes:
       - ./config.yaml:/app/config.yaml
       - ./serverops/camo/templates:/app/serverops/camo/templates
