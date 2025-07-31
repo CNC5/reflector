@@ -6,9 +6,7 @@ import psutil
 
 def check_existence_on_disk(*path: PathLike[str]):
     for p in path:
-        if os.path.isdir(p):
-            continue
-        if os.path.isfile(p):
+        if os.path.exists(p):
             continue
         raise FileNotFoundError(p)
 
