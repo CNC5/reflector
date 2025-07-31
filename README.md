@@ -10,33 +10,44 @@ A basic unit for reflecting xray, with some useful abstractions for clustering.
 
 - [Features](#features)
 - [Requirements](#requirements)
-- [Installation](#installation)
-- [Usage](#usage)
+- [Preparation](#preparation)
 - [Configuration](#configuration)
 - [License](#license)
 
 ## Features
-
 - Automatic selfsteal with letsencrypt certificates
 - User forwarding between connections
 - Multiple outbound users
 - Link type outbounds
 
-## Requirements
+## Preparation
+It is assumed you have a VPS and a domain that has an A record to this server IP address
+
+Perform ONLY ONE of docker or bare-metal
+
+#### Docker
+```bash
+git clone https://github.com/CNC5/reflector.git
+cd reflector
+bash download_camo_templates.sh
+```
+
+You can proceed to [Configuration](#configuration)
+
+#### Bare-metal
+> [!IMPORTANT]
+> `download_binaries.sh` downloads binaries: a sing-box that was most recently tested with reflector, and a static build of nginx that also was most recently tested to work with reflector. You can use your own binaries, by specifying `--nginx-bin`|`--xray-bin` or by putting them to `serverops/bin/{sing-box,nginx}`.
+###### Requirements
+Have these packages
 - git (install)
 - curl (install)
 - python3.13 (interpreter)
 - certbot (for letsencrypt certs)
 
-## Installation
-> [!NOTE]
-> You can use reflector docker image instead (you probably should)(requires to [install](https://docs.docker.com/engine/install/) docker)
+For Ubuntu install with `apt install`
 
-> [!IMPORTANT]
-> `download_binaries.sh` downloads binaries: a sing-box that was most recently tested with reflector, and a static build of nginx that also was most recently tested to work with reflector. You can use your own binaries, by specifying `--nginx-bin`|`--xray-bin` or by putting them to `serverops/bin/{sing-box,nginx}`.
-> `download_camo_templates.sh` downloads an example template.
+For Alpine install with `apk add`
 
-#### Bare-metal
 ```bash
 git clone https://github.com/CNC5/reflector.git
 cd reflector
@@ -47,27 +58,7 @@ python -m venv .venv
 pip install -r requirements.txt
 ```
 
-## Usage
-It is assumed you have a VPS and a domain that has an A record to this server IP address
-
-#### Docker
-Copy the config from [Configuration](#configuration) and paste it into `config.yaml`
-
-Edit it to yout liking:
-- leave desired inbounds
-- generate new user ids with uuidgen or with `docker run -it --rm --entrypoint /app/serverops/bin/sing-box ghcr.io/cnc5/reflector:latest-alpine generate uuid`
-- generate new private key and public key pairs with `docker run -it --rm --entrypoint /app/serverops/bin/sing-box ghcr.io/cnc5/reflector:latest-alpine generate reality-keypair`
-- for camo select the template name you want to be set up, change fqdn to a domain name that you pointed to the server
-- set issuer type to letsencrypt for production and selfsigned for testing
-- set issuer email to the email you want be presented to letsencrypt
-- leave desired outbounds, you likely want only the direct if setting up an exit server
-- add routes for users you set in inbounds, use their `name`s
-
-```bash
-docker compose up -d
-```
-
-#### Bare-metal
+Test that everything works
 ```bash
 python -m serverops --help
 ```
@@ -89,7 +80,10 @@ options:
   -s, --signal SIGNAL   send a signal to the operator
 ```
 
+You can proceed to [Configuration](#configuration)
+
 ## Configuration
+Copy the config below and paste it into `config.yaml`
 ```yaml
 apiVersion: v1
 kind: Reflector
@@ -104,10 +98,6 @@ spec:
           uuid: a4aaaa4a-aaaa-aaaa-aaaa-a4aaaaaaaa4a
           flow: ''
           short_id: a11ce01d
-        - name: bob
-          uuid: bb3bb3bb-bbbb-bbbb-bbbb-bb3bbbbbb3bb
-          flow: ''
-          short_id: b0b01d
       private_key: <privkey>
       camo:
         type: local
@@ -118,38 +108,56 @@ spec:
           email: an0n@mozmail.com
 
   outbounds:
-    - name: vless-eu
-      type: link
-      link: "vless://..."
-    - name: vless-out2
-      type: vless
-      server: 100.1.1.1
-      server_port: 443
-      server_name: unsus.eu
-      fingerprint: chrome
-      users:
-        - name: bob
-          uuid: b0b01df0-0b11-1111-1111-111111111111
-          flow: ''
-          short_id: 111111dc
-        - name: alice
-          uuid: a11ce01d-2222-2222-2222-222222222222
-          flow: ''
-          short_id: 222222ac
-      public_key: <pubkey>
     - name: direct
       type: direct
 
+#    - name: vless-eu
+#      type: link
+#      link: "vless://..."
+#    - name: vless-out2
+#      type: vless
+#      server: 100.1.1.1
+#      server_port: 443
+#      server_name: unsus.eu
+#      fingerprint: chrome
+#      users:
+#        - name: bob
+#          uuid: b0b01df0-0b11-1111-1111-111111111111
+#          flow: ''
+#          short_id: 111111dc
+#        - name: alice
+#          uuid: a11ce01d-2222-2222-2222-222222222222
+#          flow: ''
+#          short_id: 222222ac
+#      public_key: <pubkey>
+
   routes:
     - user: alice
-      outbound: vless-eu
-    - user: bob
-      outbound: vless-out2
+      outbound: direct
 
   metrics: # TODO
     port: 12345
     listen: localhost
 
+```
+
+Edit it to yout liking:
+- leave desired inbounds
+- generate new user ids with uuidgen or with `docker run -it --rm --entrypoint /app/serverops/bin/sing-box ghcr.io/cnc5/reflector:latest-alpine generate uuid` (docker) or with `serverops/bin/sing-box generate uuid` (bare-metal). Note both keys, you will need them for client configuration.
+- generate new private key and public key pairs with `docker run -it --rm --entrypoint /app/serverops/bin/sing-box ghcr.io/cnc5/reflector:latest-alpine generate reality-keypair` (docker) or with `serverops/bin/sing-box generate reality-keypair` (bare-metal).
+- for camo select the template name you want to be set up (NextJSExample is available as a preset), change fqdn to a domain name that you pointed to the server.
+- set issuer type to letsencrypt for production and selfsigned for testing.
+- set issuer email to the email you want be presented to letsencrypt.
+- leave desired outbounds, you likely want only the direct if setting up an exit server.
+- add routes for users you set in inbounds, use their `name`s.
+
+Now you can run
+```bash
+docker compose up -d
+```
+OR
+```bash
+python -m serverops
 ```
 
 ## License
