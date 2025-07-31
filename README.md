@@ -51,7 +51,7 @@ pip install -r requirements.txt
 
 #### Docker
 ```bash
-docker run -it --rm z1xs4xg62/reflector:latest-alpine --help
+docker run -it --rm ghcr.io/cnc5/reflector:latest-alpine --help
 ```
 Example output
 ```
