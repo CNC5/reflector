@@ -48,27 +48,23 @@ pip install -r requirements.txt
 ```
 
 ## Usage
+It is assumed you have a VPS and a domain that has an A record to this server IP address
 
 #### Docker
-```bash
-docker run -it --rm ghcr.io/cnc5/reflector:latest-alpine --help
-```
-Example output
-```
-usage: __main__.py [-h] [--tmp TMP] [-c CONFIG] [--pid-file PID_FILE] [--nginx-bin NGINX_BIN] [--xray-bin XRAY_BIN]
-                   [--camo-dir CAMO_DIR] [-d] [-s SIGNAL]
+Copy the config from [Configuration](#configuration) and paste it into `config.yaml`
 
-options:
-  -h, --help            show this help message and exit
-  --tmp TMP             directory for tmp storage
-  -c, --config CONFIG   config file, in cwd
-  --pid-file PID_FILE   pid file, in the tmp directory
-  --nginx-bin NGINX_BIN
-                        nginx binary
-  --xray-bin XRAY_BIN   xray binary
-  --camo-dir CAMO_DIR   camo templates dir
-  -d, --debug
-  -s, --signal SIGNAL   send a signal to the operator
+Edit it to yout liking:
+- leave desired inbounds
+- generate new user ids with uuidgen or with `docker run -it --rm --entrypoint /app/serverops/bin/sing-box ghcr.io/cnc5/reflector:latest-alpine generate uuid`
+- generate new private key and public key pairs with `docker run -it --rm --entrypoint /app/serverops/bin/sing-box ghcr.io/cnc5/reflector:latest-alpine generate reality-keypair`
+- for camo select the template name you want to be set up, change fqdn to a domain name that you pointed to the server
+- set issuer type to letsencrypt for production and selfsigned for testing
+- set issuer email to the email you want be presented to letsencrypt
+- leave desired outbounds, you likely want only the direct if setting up an exit server
+- add routes for users you set in inbounds, use their `name`s
+
+```bash
+docker compose up -d
 ```
 
 #### Bare-metal
