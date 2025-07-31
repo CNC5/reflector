@@ -8,7 +8,7 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: ghcr.io/CNC5/reflector
+  IMAGE_NAME: ghcr.io/cnc5/reflector
 
 jobs:
   build-and-push-image:
