@@ -103,7 +103,6 @@ class Operator:
         config = self.config
         for conf_inb in config.spec.inbounds:
             local_camo_port = find_free_port()
-            local_xray_port = find_free_port()
 
             # NGX
             certificate = prepare_certificate(
@@ -120,13 +119,6 @@ class Operator:
                 ssl_domain=conf_inb.camo.fqdn,
                 ssl_certificate=certificate
             )
-            self.configure_nginx_xray_proxy(
-                listen=f"{conf_inb.listen}:{conf_inb.listen_port}",
-                proxy_pass=f"https://127.0.0.1:{local_xray_port}",
-                ssl_domain=conf_inb.camo.fqdn,
-                ssl_certificate=certificate,
-                proxy_ssl_name=conf_inb.camo.fqdn
-            )
             self.inbound_ports.append(str(conf_inb.listen_port))
 
             # XRAY
@@ -135,7 +127,7 @@ class Operator:
                 inbound_tag=conf_inb.name)
             if conf_inb.type == "vless":
                 new_inb.listen = "127.0.0.1"
-                new_inb.listen_port = local_xray_port
+                new_inb.listen_port = conf_inb.listen_port
                 tls = new_inb.tls = new_inb.__annotations__["tls"]()
                 tls.enabled = True
                 tls.server_name = conf_inb.camo.fqdn
