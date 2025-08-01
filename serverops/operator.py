@@ -126,7 +126,7 @@ class Operator:
                 inbound_type=conf_inb.type,
                 inbound_tag=conf_inb.name)
             if conf_inb.type == "vless":
-                new_inb.listen = "127.0.0.1"
+                new_inb.listen = conf_inb.listen
                 new_inb.listen_port = conf_inb.listen_port
                 tls = new_inb.tls = new_inb.__annotations__["tls"]()
                 tls.enabled = True
