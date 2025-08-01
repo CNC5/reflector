@@ -14,6 +14,7 @@ RUN bash download_camo_templates.sh
 RUN apk add --no-cache openssl certbot
 COPY serverops serverops
 COPY test.config.yaml config.yaml
+COPY LICENSE LICENSE
 RUN adduser -D -G www-data www-data
 
 ENTRYPOINT ["python", "-m", "serverops"]
