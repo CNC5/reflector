@@ -93,7 +93,7 @@ class Spec(BaseModel):
     inbounds: List[Inbound]
     outbounds: List[Outbound]
     routes: List[Route]
-    metrics: Metrics
+    metrics: Optional[Metrics]
 
 
 class ConfigV1(BaseModel):
