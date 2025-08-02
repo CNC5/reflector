@@ -9,7 +9,6 @@ class NginxDumpableConfig:
 
     def dump(self) -> dict:
         dumpdict = dict()
-        print(vars(self))
         for key, value in vars(self).items():
             if key == "params":
                 dumpdict.update(value)
