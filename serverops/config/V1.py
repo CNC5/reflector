@@ -95,6 +95,7 @@ class Spec(BaseModel):
     routes: List[Route]
     metrics: Metrics = None
 
+
 class ConfigV1(BaseModel):
     apiVersion: StrictStr
     kind: StrictStr
