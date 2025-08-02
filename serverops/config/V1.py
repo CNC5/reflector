@@ -93,8 +93,7 @@ class Spec(BaseModel):
     inbounds: List[Inbound]
     outbounds: List[Outbound]
     routes: List[Route]
-    metrics: Optional[Metrics]
-
+    metrics: Metrics = None
 
 class ConfigV1(BaseModel):
     apiVersion: StrictStr
