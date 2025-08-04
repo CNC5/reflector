@@ -3,7 +3,7 @@
 A basic unit for reflecting xray, with some useful abstractions for clustering.
 
 ## Goals
-- Easily usable xray that is configured according to best practices
+- Easily usable vless that is configured according to best practices
 - Abstractions for clustering and HA
 
 ## Table of Contents
