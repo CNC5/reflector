@@ -1,0 +1,1 @@
+This package exists to break circular dependencies for pluggable modules, when a module needs to use a struct universal for all modules, but also needs to be imported for automatic selection
