@@ -1,8 +1,18 @@
 package utils
 
 import (
+	"fmt"
 	"net"
 )
+
+func IsPortBindable(port int) bool {
+	ln, err := net.Listen("tcp", fmt.Sprintf(":%d", port))
+	if err != nil {
+		return false
+	}
+	ln.Close()
+	return true
+}
 
 func FindFreePorts(n int) ([]int, error) {
 	ports := make([]int, 0, n)
