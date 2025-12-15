@@ -17,20 +17,20 @@ import (
 	"github.com/google/go-cmp/cmp"
 )
 
-type portableCaddy struct {
+type PortableCaddy struct {
 	version        *caddyVersion
 	binaryLocation string
 	caddyjson      *caddyJSON
 	currentProcess *exec.Cmd
 }
 
-func (c *portableCaddy) caddyVersion() *caddyVersion {
+func (c *PortableCaddy) caddyVersion() *caddyVersion {
 	outputBytes, _ := exec.Command(c.binaryLocation, "version").Output()
 	output := strings.Split(string(outputBytes), " ")[0] // from 'vX.Y.Z <HASH>' split and select version
 	return LoadCaddyVersion(&output)
 }
 
-func (c *portableCaddy) EnsureBinary() {
+func (c *PortableCaddy) EnsureBinary() {
 	debURL := "https://github.com/caddyserver/caddy/releases/download/" + c.version.ReprV() + "/caddy_" + c.version.Repr() + "_linux_amd64.deb"
 	debLocation := "/tmp/caddy.deb"
 	debBinPath := "./usr/bin/caddy"
@@ -60,7 +60,7 @@ func (c *portableCaddy) EnsureBinary() {
 	os.Chmod(c.binaryLocation, 0o755)
 }
 
-func (c *portableCaddy) uploadConfig() error {
+func (c *PortableCaddy) uploadConfig() error {
 	req, err := http.NewRequest(
 		"POST",
 		"http://localhost:2019/load",
@@ -97,7 +97,7 @@ func forwardCaddyLogs(pipe io.ReadCloser) {
 	}
 }
 
-func (c *portableCaddy) Start() {
+func (c *PortableCaddy) Start() {
 	c.currentProcess = exec.Command(c.binaryLocation, "run")
 	stdout, _ := c.currentProcess.StdoutPipe()
 	stderr, _ := c.currentProcess.StderrPipe()
@@ -113,7 +113,7 @@ func (c *portableCaddy) Start() {
 	c.currentProcess.Start()
 }
 
-func (c *portableCaddy) Reload() {
+func (c *PortableCaddy) Reload() {
 	backoffInitDelay := time.Second
 	maxRetry := 100
 	for range maxRetry {
@@ -132,15 +132,15 @@ func (c *portableCaddy) Reload() {
 	}
 }
 
-func (c *portableCaddy) AddRootStaticLocation(domain string, staticDir string) {
-	c.caddyjson.AddRootStaticLocation(domain, staticDir)
+func (c *PortableCaddy) AddRootStaticLocation(domain string, httpsPort int, staticDir string) {
+	c.caddyjson.AddRootStaticLocation(domain, httpsPort, staticDir)
 }
 
-func (c *portableCaddy) AddProxyLocation(domain string, url string, proxyTarget string) {
-	c.caddyjson.AddProxyLocation(domain, url, proxyTarget)
+func (c *PortableCaddy) AddProxyLocation(domain string, httpsPort int, url string, proxyTarget string) {
+	c.caddyjson.AddProxyLocation(domain, httpsPort, url, proxyTarget)
 }
 
-func (c *portableCaddy) Stop() {
+func (c *PortableCaddy) Stop() {
 	syscall.Kill(c.currentProcess.Process.Pid, syscall.SIGTERM)
 	c.currentProcess.Wait()
 	// for range 30 {
@@ -152,9 +152,9 @@ func (c *portableCaddy) Stop() {
 	//syscall.Kill(c.currentProcess.Process.Pid, syscall.SIGKILL)
 }
 
-func NewPortableCaddy(version string) *portableCaddy {
+func NewPortableCaddy(version string) *PortableCaddy {
 	newCaddy :=
-		&portableCaddy{
+		&PortableCaddy{
 			binaryLocation: "./caddy-bin",
 			caddyjson:      NewCaddyJSON([]string{":8443"})}
 	newCaddy.caddyjson.Apps.Http.HTTPPort = 8008
