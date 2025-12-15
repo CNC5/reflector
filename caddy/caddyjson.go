@@ -2,6 +2,7 @@ package caddy
 
 import (
 	"encoding/json"
+	"fmt"
 	"slices"
 )
 
@@ -174,12 +175,12 @@ func (cj *caddyJSON) ensureServer(name string, listen []string) *caddyJSONAppHTT
 	return server
 }
 
-func (cj *caddyJSON) AddProxyLocation(domain string, url string, proxyTarget string) {
-	cj.ensureServer(domain, cj.httpsListen).
+func (cj *caddyJSON) AddProxyLocation(domain string, httpsPort int, url string, proxyTarget string) {
+	cj.ensureServer(domain, []string{fmt.Sprintf(":%d", httpsPort)}).
 		addRouteReverseProxy(domain, proxyTarget, url)
 }
 
-func (cj *caddyJSON) AddRootStaticLocation(domain string, staticDir string) {
-	cj.ensureServer(domain, cj.httpsListen).
+func (cj *caddyJSON) AddRootStaticLocation(domain string, httpsPort int, staticDir string) {
+	cj.ensureServer(domain, []string{fmt.Sprintf(":%d", httpsPort)}).
 		addRouteRootStaticLocation(domain, staticDir)
 }
