@@ -1,4 +1,4 @@
-package controller
+package logic
 
 import (
 	"reflector/caddy"
@@ -9,8 +9,8 @@ import (
 type HTTPServer interface {
 	Start()
 	Reload()
-	AddRootStaticLocation(domain string, staticDir string)
-	AddProxyLocation(domain string, url string, proxyTarget string)
+	AddRootStaticLocation(domain string, httpsPort int, staticDir string)
+	AddProxyLocation(domain string, httpsPort int, url string, proxyTarget string)
 	Stop()
 }
 
