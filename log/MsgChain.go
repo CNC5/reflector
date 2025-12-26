@@ -2,6 +2,7 @@ package log
 
 import (
 	"encoding/json"
+	"fmt"
 	"time"
 )
 
@@ -42,5 +43,10 @@ func (mc *MsgChain) Done() {
 
 func (mc *MsgChain) Msg(msg string) {
 	mc.messages["msg"] = msg
+	mc.Done()
+}
+
+func (mc *MsgChain) Msgf(format string, a ...any) {
+	mc.messages["msg"] = fmt.Sprintf(format, a...)
 	mc.Done()
 }
