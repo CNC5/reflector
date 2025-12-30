@@ -1,16 +1,12 @@
 package cmd
 
 import (
-	"encoding/json"
-	"fmt"
-	"os"
-	"reflector/controller"
 	"reflector/log"
+	"reflector/logic"
 	"reflector/utils"
 	"reflector/xray"
 
 	"github.com/spf13/cobra"
-	"gopkg.in/yaml.v3"
 )
 
 // loadCmd represents the load command
@@ -33,7 +29,7 @@ var loadHTTPServerCmd = &cobra.Command{
 	Use:   "httpserver",
 	Short: "Detect existing servers and load appropriate modules",
 	Run: func(cmd *cobra.Command, args []string) {
-		controller.HTTPServerAutoSelect()
+		logic.HTTPServerAutoSelect()
 	},
 }
 
@@ -45,41 +41,41 @@ var loadXrayCmd = &cobra.Command{
 	},
 }
 
-var loadReflectorConfigCmd = &cobra.Command{
-	Use:   "reflectorconfig",
-	Short: "Load reflector config",
-	Run: func(cmd *cobra.Command, args []string) {
-		rcbytes, err := os.ReadFile(*reflectorConfigLocation)
-		if err != nil {
-			log.GetDefaultLogger().Error().
-				Update("err", err).
-				Update("location", reflectorConfigLocation).
-				Msg("failed to open the file")
-			return
-		}
-		c, err := controller.LoadConfig(rcbytes)
-		if err != nil {
-			log.GetDefaultLogger().Error().
-				Update("err", err).
-				Msg("failed to load the file")
-			return
-		}
-		marshc, _ := yaml.Marshal(c)
-		xc := xray.NewXrayJSON()
-		controller.ParseReflectorConfigV1(c, xc)
-		marshxc, _ := json.Marshal(xc)
-		log.GetDefaultLogger().Debug().
-			Update("xrayconfig", fmt.Sprintf("%s", marshxc)).
-			Update("config", fmt.Sprintf("%s", marshc)).Msg("config loaded")
-	},
-}
+// var loadReflectorConfigCmd = &cobra.Command{
+// 	Use:   "reflectorconfig",
+// 	Short: "Load reflector config",
+// 	Run: func(cmd *cobra.Command, args []string) {
+// 		rcbytes, err := os.ReadFile(*reflectorConfigLocation)
+// 		if err != nil {
+// 			log.GetDefaultLogger().Error().
+// 				Update("err", err).
+// 				Update("location", reflectorConfigLocation).
+// 				Msg("failed to open the file")
+// 			return
+// 		}
+// 		c, err := logic.LoadConfig(rcbytes)
+// 		if err != nil {
+// 			log.GetDefaultLogger().Error().
+// 				Update("err", err).
+// 				Msg("failed to load the file")
+// 			return
+// 		}
+// 		marshc, _ := yaml.Marshal(c)
+// 		xc := xray.NewXrayConfig()
+// 		logic.NewReflector()
+// 		marshxc, _ := json.Marshal(xc)
+// 		log.GetDefaultLogger().Debug().
+// 			Update("xrayconfig", fmt.Sprintf("%s", marshxc)).
+// 			Update("config", fmt.Sprintf("%s", marshc)).Msg("config loaded")
+// 	},
+// }
 
 func init() {
 	rootCmd.AddCommand(loadCmd)
 	loadCmd.AddCommand(loadDetectCmd)
 	loadCmd.AddCommand(loadHTTPServerCmd)
 	loadCmd.AddCommand(loadXrayCmd)
-	loadCmd.AddCommand(loadReflectorConfigCmd)
+	// loadCmd.AddCommand(loadReflectorConfigCmd)
 
 	// Here you will define your flags and configuration settings.
 
