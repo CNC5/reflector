@@ -2,10 +2,10 @@ package xray
 
 import (
 	"bufio"
-	"bytes"
+	"encoding/json"
 	"errors"
+	"fmt"
 	"io"
-	"net/http"
 	"os"
 	"os/exec"
 	"reflector/log"
@@ -17,14 +17,15 @@ import (
 	"github.com/google/go-cmp/cmp"
 )
 
-type portableXray struct {
+type PortableXray struct {
 	version        *xrayVersion
 	binaryLocation string
-	xrayjson       *xrayJSON
+	configLocation string
+	XrayConfig     *XrayConfig
 	currentProcess *exec.Cmd
 }
 
-func (c *portableXray) xrayVersion() *xrayVersion {
+func (c *PortableXray) xrayVersion() *xrayVersion {
 	outputBytes, err := exec.Command(c.binaryLocation, "version").Output()
 	if err != nil {
 		return &xrayVersion{Major: 0, Minor: 0, Patch: 0}
@@ -38,7 +39,7 @@ func (c *portableXray) xrayVersion() *xrayVersion {
 	return LoadXrayVersion(&output)
 }
 
-func (c *portableXray) EnsureBinary() {
+func (c *PortableXray) EnsureBinary() {
 	zipURL := "https://github.com/XTLS/Xray-core/releases/download/" + c.version.ReprV() + "/Xray-linux-64.zip"
 	zipLocation := "/tmp/Xray-linux-64.zip"
 	zipBinPath := "xray"
@@ -68,33 +69,20 @@ func (c *portableXray) EnsureBinary() {
 	os.Chmod(c.binaryLocation, 0o755)
 }
 
-func (c *portableXray) uploadConfig() error {
-	panic("not implemented")
-	req, err := http.NewRequest(
-		"POST",
-		"http://localhost:2019/load",
-		bytes.NewBuffer(c.xrayjson.Marshal()))
-	log.GetDefaultLogger().Debug().
-		Update("config", c.xrayjson.Marshal()).Msg("Uploading new xray config")
-	req.Header.Add("Content-Type", "application/json")
-	client := &http.Client{}
+func (c *PortableXray) updateConfig() error {
+	// TODO load config first for crypto persistence
+	configBytes, err := json.Marshal(c.XrayConfig)
 	if err != nil {
-		return err
+		return fmt.Errorf("error marshaling config: %s", err.Error())
 	}
-	resp, err := client.Do(req)
+	configFile, err := os.Create(c.configLocation)
 	if err != nil {
-		return err
+		return fmt.Errorf("error opening config file: %s", err.Error())
 	}
-	defer resp.Body.Close()
-	if resp.StatusCode != 200 {
-		log.GetDefaultLogger().Error().
-			Update("status_code", resp.StatusCode).
-			Update("body", resp.Body).
-			Msg("failed to update xray config via API")
-		return errors.New("non 200 status code")
+	_, err = configFile.Write(configBytes)
+	if err != nil {
+		return fmt.Errorf("error writing config file: %s", err.Error())
 	}
-	log.GetDefaultLogger().Debug().
-		Update("status_code", resp.StatusCode).Msg("upload config succeeded")
 	return nil
 }
 
@@ -106,14 +94,19 @@ func forwardXrayLogs(pipe io.ReadCloser) {
 	}
 }
 
-func (c *portableXray) Start() {
-	c.currentProcess = exec.Command(c.binaryLocation, "run")
+func (c *PortableXray) Start() {
+	if err := c.updateConfig(); err != nil {
+		panic(err)
+	}
+	c.currentProcess = exec.Command(
+		c.binaryLocation, "run",
+		"-c", c.configLocation,
+	)
 	stdout, _ := c.currentProcess.StdoutPipe()
 	stderr, _ := c.currentProcess.StderrPipe()
 
 	if err := c.currentProcess.Start(); err != nil {
-		log.GetDefaultLogger().Fatal().
-			Update("error", err).Msg("failed to start:")
+		panic(err)
 	}
 
 	go forwardXrayLogs(stdout)
@@ -122,17 +115,17 @@ func (c *portableXray) Start() {
 	c.currentProcess.Start()
 }
 
-func (c *portableXray) Reload() {
+func (c *PortableXray) Reload() {
 	backoffDelay := time.Second
 	maxBackoffDelay := 60 * time.Second
 	maxRetry := 100
 	for range maxRetry {
-		err := c.uploadConfig()
+		err := c.updateConfig()
 		if err == nil {
 			break
 		}
 		log.GetDefaultLogger().Error().
-			Update("retry_delay_seconds", backoffDelay.Seconds()).Msg("config upload failed")
+			Update("retry_delay_seconds", backoffDelay.Seconds()).Msg("config update failed")
 		time.Sleep(backoffDelay)
 		if backoffDelay < maxBackoffDelay {
 			backoffDelay *= 2
@@ -142,7 +135,7 @@ func (c *portableXray) Reload() {
 	}
 }
 
-func (c *portableXray) Stop() {
+func (c *PortableXray) Stop() {
 	syscall.Kill(c.currentProcess.Process.Pid, syscall.SIGTERM)
 	c.currentProcess.Wait()
 	// for range 30 {
@@ -154,11 +147,13 @@ func (c *portableXray) Stop() {
 	//syscall.Kill(c.currentProcess.Process.Pid, syscall.SIGKILL)
 }
 
-func NewPortableXray(version string) *portableXray {
+func NewPortableXray(version string) *PortableXray {
 	newXray :=
-		&portableXray{
+		&PortableXray{
 			binaryLocation: "./xray-bin",
-			xrayjson:       NewXrayJSON()}
+			XrayConfig:     NewXrayConfig(),
+			configLocation: "./xray-config.json",
+		}
 	newXray.version = LoadXrayVersion(&version)
 	newXray.EnsureBinary()
 	log.GetDefaultLogger().Info().Msg("portable xray ready")
