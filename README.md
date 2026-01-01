@@ -34,5 +34,5 @@ Flags:
 ```
 git clone https://github.com/CNC5/reflector
 cd reflector
-go build
+go build -ldflags "-X reflector/logic.Version=v1.2.3 -X reflector/logic.Commit=$(git rev-parse --short @)
 ```
