@@ -35,7 +35,7 @@ func init() {
 	debug = rootCmd.PersistentFlags().BoolP("debug", "d", false, "Enable debugging")
 	reflectorConfigLocation =
 		rootCmd.PersistentFlags().StringP(
-			"reflector-config", "r",
+			"config", "c",
 			"./config.yaml",
 			"Reflector config location",
 		)
