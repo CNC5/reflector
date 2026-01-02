@@ -25,11 +25,14 @@ Available Commands:
   help        Help about any command
   load        Load a management module
   run         Start the reflector
+  version     Check version
 
 Flags:
-  -d, --debug                     Enable debugging
-  -h, --help                      help for reflector
-  -r, --reflector-config string   Reflector config location (default "./config.yaml")
+  -c, --config string   Reflector config location (default "./config.yaml")
+  -d, --debug           Enable debugging
+  -h, --help            help for reflector
+
+Use "reflector [command] --help" for more information about a command.
 ```
 
 ## build
