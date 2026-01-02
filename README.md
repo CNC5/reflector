@@ -11,7 +11,9 @@ A management solution for xray that does boring steps for you
 > and instead using a web panel or pure xray-core to gain understanding
 
 ## config
-Refer to [example.config.yaml](https://github.com/CNC5/reflector/blob/main/example.config.yaml)
+Refer to
+- [xhttp.example.config.yaml](https://github.com/CNC5/reflector/blob/main/xhttp.example.config.yaml)
+- [reality.example.config.yaml](https://github.com/CNC5/reflector/blob/main/reality.example.config.yaml)
 
 ## run
 ```
