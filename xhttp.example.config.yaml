@@ -1,0 +1,41 @@
+apiVersion: v1
+kind: Reflector
+spec:
+  camos:
+    default: # camo name for future reference
+      # security currently can be
+      # 'reality' - steal someone's tls
+      # 'wtls' - web/www tls (to distinguish from xray 'tls'), 
+      #          setup a caddy web server as a decoy
+      security: wtls
+
+      # template of the wtls content, can be
+      # 'docker://' image (full image ref required)
+      # 'oci://' image (full image ref required)
+      # './example/location' relative path to a folder
+      # '/example/location' absolute path to a folder
+      template: docker://docker.io/z1xs4xg62/camo:example
+
+      # domain name to get certificates for (wtls)
+      fqdn: localhost
+
+  inbounds:
+    - name: vless-in
+      type: vless
+      camo: default
+      listen: 0.0.0.0
+      listen_port: 443
+      xhttpPath: /secondsbeforedawn
+      transport: xhttp
+      users:
+        - name: bob
+          uuid: bb3bb3bb-bbbb-bbbb-bbbb-bb3bbbbbb3bb
+          short_id: b0b01d
+
+  outbounds:
+    - name: direct
+      type: direct
+
+  routes:
+    - user: bob
+      outbound: direct

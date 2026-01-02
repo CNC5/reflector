@@ -7,18 +7,10 @@ spec:
       # 'reality' - steal someone's tls
       # 'wtls' - web/www tls (to distinguish from xray 'tls'), 
       #          setup a caddy web server as a decoy
-      security: wtls
+      security: reality
 
-      # template of the wtls content, can be
-      # 'docker://' image (full image ref required)
-      # 'oci://' image (full image ref required)
-      # './example/location' relative path to a folder
-      # '/example/location' absolute path to a folder
-      template: docker://docker.io/z1xs4xg62/camo:example
-
-      # domain name to steal tls from (reality),
-      # or to get certificates for (wtls)
-      fqdn: localhost
+      # domain name to steal tls from (reality)
+      fqdn: google.com
 
   inbounds:
     - name: vless-in
@@ -26,15 +18,14 @@ spec:
       camo: default
       listen: 0.0.0.0
       listen_port: 8443
-      xhttpPath: /parmesan
-      transport: xhttp
+      transport: tcp
 
       # reality privkey
       private_key: KMDYAHPo2W2ycEGSEhRV7KWDgKcL6vjvgw57iPdsF0g
       users:
         - name: bob
           uuid: bb3bb3bb-bbbb-bbbb-bbbb-bb3bbbbbb3bb
-          flow: ''
+          flow: 'xtls-rprx-vision'
           short_id: b0b01d
 
   outbounds:
