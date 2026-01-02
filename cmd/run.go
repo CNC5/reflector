@@ -17,9 +17,14 @@ var runCmd = &cobra.Command{
 			"v2.9.0",
 			"v25.9.11",
 		)
-		config, err := os.Open("config.yaml")
+		config, err := os.Open(*reflectorConfigLocation)
 		if err != nil {
-			log.GetDefaultLogger().Error().Msg("failed to open config.yaml")
+			log.GetDefaultLogger().
+				Error().
+				Update("err", err.Error()).
+				Msgf(
+					"failed to open %s",
+					*reflectorConfigLocation)
 			os.Exit(1)
 		}
 		err = r.ParseReflectorConfigV1(config)
